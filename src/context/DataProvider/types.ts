@@ -20,6 +20,7 @@ export interface RawData {
     SavingsContractQueryResult['data']
   >['savingsContracts'][0];
   tokens: TokensState;
+  etherPrice: string;
 }
 
 export type PartialRawData = {
@@ -28,6 +29,7 @@ export type PartialRawData = {
   mAsset?: RawData['mAsset'];
   savingsContract?: RawData['savingsContract'];
   tokens: RawData['tokens'];
+  etherPrice?: RawData['etherPrice'];
 };
 
 export enum BassetStatus {
@@ -100,4 +102,5 @@ export interface DataState {
   bAssets: {
     [address: string]: BassetState;
   };
+  etherPrice?: BigDecimal;
 }

@@ -1,4 +1,11 @@
-import React, { createContext, FC, useContext, useMemo } from 'react';
+import React, {
+  createContext,
+  FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { pipe } from 'ts-pipe-compose';
 import useDebouncedMemo from '@sevenoutman/use-debounced-memo';
 
@@ -35,7 +42,25 @@ const setDataState = (data: PartialRawData): DataState | undefined => {
   return undefined;
 };
 
+const COINGECKO_ETH_USD_URL =
+  'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
+
+const useEtherPriceData = (): string | undefined => {
+  const [etherPrice, setEtherPrice] = useState<string | undefined>();
+
+  useEffect(() => {
+    window.fetch(COINGECKO_ETH_USD_URL).then(res =>
+      res.json().then(({ ethereum: { usd } }) => {
+        setEtherPrice(usd);
+      }),
+    );
+  }, [setEtherPrice]);
+
+  return etherPrice;
+};
+
 const useRawData = (): PartialRawData => {
+  const etherPrice = useEtherPriceData();
   const tokens = useTokensState();
   const mUsdSub = useMusdSubscription();
   const mUsdSavingsSub = useMusdSavingsSubscription();
@@ -56,8 +81,16 @@ const useRawData = (): PartialRawData => {
       mAsset,
       savingsContract,
       tokens,
+      etherPrice,
     }),
-    [tokens, mAsset, savingsContract, creditBalances, latestExchangeRate],
+    [
+      tokens,
+      mAsset,
+      savingsContract,
+      creditBalances,
+      latestExchangeRate,
+      etherPrice,
+    ],
     500,
   );
 };
@@ -98,3 +131,6 @@ export const useTotalSavings = (): BigDecimal | undefined =>
 
 export const useBassetState = (address: string): BassetState | undefined =>
   useDataState()?.bAssets[address];
+
+export const useEtherPrice = (): BigDecimal | undefined =>
+  useDataState()?.etherPrice;

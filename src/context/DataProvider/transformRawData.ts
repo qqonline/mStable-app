@@ -126,13 +126,18 @@ const getBassetsState = (
     {},
   );
 
+const getEtherPrice = (etherPrice?: string): BigDecimal | undefined =>
+  etherPrice ? BigDecimal.maybeParse(etherPrice, 18) : undefined;
+
 export const transformRawData = (rawData: RawData): DataState => {
   const mAsset = getMassetState(rawData);
   const savingsContract = getSavingsContractState(rawData);
   const bAssets = getBassetsState(rawData, mAsset);
+  const etherPrice = getEtherPrice(rawData.etherPrice);
   return {
     mAsset,
     savingsContract,
     bAssets,
+    etherPrice,
   };
 };
